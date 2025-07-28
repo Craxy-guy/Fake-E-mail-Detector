@@ -1,5 +1,3 @@
-CODE - 
-
 # fake_email_gradio.py
 
 import pandas as pd
