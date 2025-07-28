@@ -1,0 +1,73 @@
+CODE - 
+
+# fake_email_gradio.py
+
+import pandas as pd
+import re
+import string
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.linear_model import LogisticRegression
+from sklearn.model_selection import train_test_split
+from imblearn.over_sampling import SMOTE
+from scipy.sparse import csr_matrix, hstack
+import gradio as gr
+
+# Load and prepare data
+df = pd.read_csv("SMSSpamCollection", sep='\t', names=["label", "message"])
+df['label'] = df['label'].map({'ham': 0, 'spam': 1})
+
+# Cleaning function
+def clean_text(text):
+    text = text.lower()
+    text = re.sub(r"http\S+|www\S+|https\S+", '', text)
+    text = re.sub(r'\@w+|\#','', text)
+    text = re.sub(r'[%s]' % re.escape(string.punctuation), '', text)
+    text = re.sub(r'\d+', '', text)
+    text = text.strip()
+    return text
+
+# Custom keyword features
+spam_keywords = ["account", "urgent", "login", "verify", "click here", "free", "win", "bank", "password", "limited"]
+
+def keyword_features(text):
+    return sum(1 for word in spam_keywords if word in text.lower())
+
+df['clean_message'] = df['message'].apply(clean_text)
+df['keyword_count'] = df['clean_message'].apply(keyword_features)
+
+# Vectorization
+vectorizer = TfidfVectorizer()
+X_text = vectorizer.fit_transform(df['clean_message'])
+X_keywords = csr_matrix(df['keyword_count']).T
+X = hstack([X_text, X_keywords])
+y = df['label']
+
+# Balance data
+sm = SMOTE(random_state=42)
+X_res, y_res = sm.fit_resample(X, y)
+
+# Train model
+X_train, X_test, y_train, y_test = train_test_split(X_res, y_res, test_size=0.2, random_state=42)
+model = LogisticRegression()
+model.fit(X_train, y_train)
+
+# Prediction function for Gradio
+def predict_email(text):
+    cleaned = clean_text(text)
+    keyword_feat = csr_matrix([[keyword_features(cleaned)]])
+    vectorized = vectorizer.transform([cleaned])
+    combined = hstack([vectorized, keyword_feat])
+    prediction = model.predict(combined)[0]
+    confidence = model.predict_proba(combined)[0][prediction]
+    return "❌ Fake/Spam Email" if prediction == 1 else "✅ Legit Email", f"Confidence: {confidence:.2%}"
+
+# Gradio interface
+interface = gr.Interface(
+    fn=predict_email,
+    inputs=gr.Textbox(lines=6, placeholder="Paste your email message here..."),
+    outputs=["text", "text"],
+    title="📧 Fake Email Detector",
+    description="Check whether an email message is fake or legit using ML."
+)
+
+interface.launch()
