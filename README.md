@@ -1,3 +1,5 @@
+# Fake Email Detector
+
 **# How It Works**
 
 This project is a Fake Email Detector that uses Machine Learning to identify whether an email message is genuine or fake/spam. It is trained on the popular SMS Spam Collection Dataset using natural language processing (NLP) techniques and classification algorithms.
