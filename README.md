@@ -29,9 +29,3 @@ Deploys a simple Gradio web app for live input and prediction.
 5)Gradio (for web interface)
 
 Just input your email/message into the Gradio interface, and the model will tell you whether it’s likely Fake/Spam or Genuine.
-
-# How to Run
-
-```bash
-pip install -r requirements.txt
-python app.py
