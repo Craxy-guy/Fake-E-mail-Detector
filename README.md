@@ -7,7 +7,7 @@ The Fake Email Detector is a machine learning-based web application designed to 
 
 This project is a Fake Email Detector that uses Machine Learning to identify whether an email message is genuine or fake/spam. It is trained on the popular SMS Spam Collection Dataset using natural language processing (NLP) techniques and classification algorithms.
 
-**Key Features:**
+**# Key Features:**
 Preprocesses text using tokenization, stopword removal, stemming, and TF-IDF vectorization.
 
 Balances the dataset using SMOTE to improve accuracy.
@@ -16,16 +16,17 @@ Trains a Logistic Regression model to classify messages.
 
 Deploys a simple Gradio web app for live input and prediction.
 
-**Tools & Libraries Used:**
-Python
+**# Tools & Libraries Used:**
 
-scikit-learn
+1)Python
 
-imbalanced-learn (SMOTE)
+2)scikit-learn
 
-nltk
+3)imbalanced-learn (SMOTE)
 
-Gradio (for web interface)
+4)nltk
+
+5)Gradio (for web interface)
 
 Just input your email/message into the Gradio interface, and the model will tell you whether it’s likely Fake/Spam or Genuine.
 
